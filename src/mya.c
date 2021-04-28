@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <argp.h>
-#include <curl/curl.h>
-#include <json-c/json.h>
 #include <regex.h>
+#include "mya.h"
 
 #define MIN_USERNAME_LENGTH  2
 #define MAX_USERNAME_LENGTH  16

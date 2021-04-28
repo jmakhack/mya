@@ -19,15 +19,18 @@ DIRGUARD=@mkdir -p $(@D)
 ODIR:=obj
 SDIR:=src
 BDIR:=bin
+TDIR:=tests
 EXEC:=mya
+TEST:=check_mya
 LIBS:=-lcurl -ljson-c
+TLIB:=-lcheck
 UNAME:=$(shell uname)
 
 ifeq ($(UNAME),Darwin)
 	LIBS+=-largp
 endif
 
-TARGET:=$(BDIR)/$(EXEC)
+TARGET:=$(addprefix $(BDIR)/, $(EXEC))
 
 _OBJ:=$(EXEC).o
 OBJ:=$(patsubst %,$(ODIR)/%,$(_OBJ))
@@ -36,13 +39,19 @@ $(TARGET): $(OBJ)
 	$(DIRGUARD)
 	$(CC) -o $@ $^ $(LIBS)
 
-$(ODIR)/%.o: $(SDIR)/%.c
+$(addprefix $(ODIR)/, %.o): $(addprefix $(SDIR)/, %.c)
 	$(DIRGUARD)
 	$(CC) $(CFLAGS) $< -o $@
 
-.PHONY: all clean
+$(addprefix $(TDIR)/, %): $(addprefix $(TDIR)/, %.c)
+	$(CC) $(TLIB) $< -o $@ 
 
-all: $(TARGET)
+.PHONY: all test clean
+
+all: $(TARGET) test
+
+test: $(addprefix $(TDIR)/, $(TEST))
+	$(addprefix $(TDIR)/, $(TEST))
 
 clean:
-	rm -rf $(ODIR) $(BDIR) *~
+	rm -rf $(ODIR) $(BDIR) $(addprefix $(TDIR)/, $(TEST)) *~
